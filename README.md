@@ -1,5 +1,5 @@
-# chatbot
-Simple Chat interface for building an AI powered chatbot experience over your data.
+# 💬 Chatbot (LLM)
+A simple Chat interface for building an AI powered chatbot experience over your data.
 
 ## Getting Started
 
