@@ -44,7 +44,7 @@ const ConfigModal = (props: ConfigModalProps) => {
             </Dialog.Title>
             <div className="mt-2">
               <p className="text-sm text-gray-500">
-                Adjust your GPT-4.0 configuration (<a href="https://platform.openai.com/docs/api-reference/chat/create#chat/create-stop">API Reference</a>)
+                Adjust your GPT-3.5 configuration (<a href="https://platform.openai.com/docs/api-reference/chat/create#chat/create-stop">API Reference</a>)
               </p>
             </div>
           </div>

@@ -45,7 +45,7 @@ async function getRetrievalQuery(messages: any[], last: any) {
   ]
 
   const res = await openai.createChatCompletion({
-    model: 'gpt-4',
+    model: 'gpt-3.5',
     messages: messagesWSystem,
     max_tokens: 35,
   });
@@ -102,7 +102,7 @@ export default async function handler(req: any) {
     ];
 
     const openAiBody = {
-      model: 'gpt-4',
+      model: 'gpt-3.5',
       stream: true,
       messages: messagesWSystem,
       temperature: temperature || DEFAULT_TEMPERATURE,
