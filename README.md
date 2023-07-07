@@ -1,5 +1,7 @@
-# 💬 Chatbot (LLM)
-A simple Chat interface for building an AI powered chatbot experience over your data.
+# 💬 Metal AI Chatbot
+A simple Chat interface for building an AI powered chatbot experience to "talk with your data".
+
+![Screenshot of chatbot]('./public/screenshot.png')
 
 ## Getting Started
 
