@@ -1,7 +1,7 @@
 import { OpenAIStream, StreamingTextResponse } from 'ai';
 import { Configuration, OpenAIApi } from 'openai-edge';
 import { retrieveContext } from '../../helpers/metal';
-const { encode } = require('gpt-tokenizer')
+import { encode } from 'gpt-tokenizer';
 
 export const config = {
   runtime: 'edge'
