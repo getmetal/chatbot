@@ -13,12 +13,6 @@ import Textarea from "@/components/Textarea";
 import { DEFAULT_PROMPT } from '@/helpers/prompts';
 
 
-enum Statuses {
-  IDLE = 'idle',
-  LOADING = 'loading',
-  COMPLETE = 'complete',
-}
-
 const Chat = () => {
   const messagesEndRef = useRef(null)
 
@@ -29,7 +23,6 @@ const Chat = () => {
   const [sources, setSources] = useState<any>([]);
   const [sourcesLoading, setSourcesLoading] = useState(false);
   const [index, setIndex] = useState('');
-  const [status, _setStatus] = useState<Statuses>(Statuses.IDLE)
   const [tokenCount, setTokenCount] = useState<number>(0);
   const [error, setError] = useState<string>('');
 
@@ -37,7 +30,7 @@ const Chat = () => {
   const [temperature, setTemperature] = useState<number | undefined>(0);
   const [maxTokens, setMaxTokens] = useState<number | undefined>();
 
-  const { messages, input, handleInputChange, handleSubmit, error: chatError, setMessages } = useChat({
+  const { isLoading, messages, input, handleInputChange, handleSubmit, error: chatError, setMessages } = useChat({
     body: {
       system,
       chunkCount,
@@ -233,7 +226,7 @@ const Chat = () => {
               value={input}
               onChange={handleInputChange}
               placeholder="Ask any question to the chatbot."
-              submitLabel={status !== Statuses.IDLE ? 'Thinking...' : '🪄 Send'}
+              submitLabel={isLoading ? 'Thinking...' : '🪄 Send'}
               onKeyDown={(event: any) => {
                 if (event.key === 'Enter' && !event.shiftKey) {
                   event.preventDefault();
