@@ -31,12 +31,13 @@ const Chat = () => {
   const [index, setIndex] = useState('');
   const [status, _setStatus] = useState<Statuses>(Statuses.IDLE)
   const [tokenCount, setTokenCount] = useState<number>(0);
+  const [error, setError] = useState<string>('');
 
   const [chunkCount, setChunkCount] = useState<number | undefined>(10);
   const [temperature, setTemperature] = useState<number | undefined>(0);
   const [maxTokens, setMaxTokens] = useState<number | undefined>();
 
-  const { messages, input, handleInputChange, handleSubmit, error, setMessages } = useChat({
+  const { messages, input, handleInputChange, handleSubmit, error: chatError, setMessages } = useChat({
     body: {
       system,
       chunkCount,
@@ -50,6 +51,13 @@ const Chat = () => {
       setTokenCount(tokenCountInt);
     },
   });
+
+  useEffect(() => {
+    if (chatError) {
+      setError(chatError?.message)
+      return;
+    }
+  }, [chatError])
 
   useEffect(() => {
     const el: any = messagesEndRef.current;
@@ -82,7 +90,7 @@ const Chat = () => {
   return (
     <>
       <Image src="/metal.svg" width={200} height={200} alt="Metal logo" className="border border-gray-500 rounded-2xl bg-black rounded-xl opacity-30 z-0 img-bkgd absolute top-10" />
-      {error ? <Error message={error?.message} onDismiss={console.log} /> : null}
+      {error ? <Error message={error} onDismiss={() => setError('')} /> : null}
       <PromptModal open={openPrompts} onClose={() => setOpenPrompts(false)} onPrompt={(txt: string) => setSystem(txt)} />
       <SourcesModal index={index} open={!!sources?.length} sources={sources} onClose={() => setSources([])} />
       <ConfigModal
