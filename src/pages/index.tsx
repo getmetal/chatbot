@@ -171,6 +171,7 @@ const Chat = () => {
         >
           {messages.map((msg, idx) => {
             const isAssistant = msg.role === 'assistant';
+            const prevMsg = messages[idx - 1];
             const isNotLast = idx !== messages.length - 1;
             return (
               <div key={idx} className={`my-3 z-10 ${isNotLast && 'border-b-[.25px] border-gray-800'} p-3 pb-6`}>
@@ -187,7 +188,14 @@ const Chat = () => {
                   {isAssistant &&
                     <button
                       disabled={sourcesLoading}
-                      onClick={() => handleSources(msg.content)}
+                      onClick={() => {
+                        if (!prevMsg) {
+                          console.log('error fetching sources, no prev msg')
+                          return;
+                        }
+                        handleSources(prevMsg.content)
+                        console.log('fetching sources for: ', prevMsg.content)
+                      }}
                       type="button"
                       className="ml-2 rounded-lg bg-gray-500 p-1 text-white shadow-sm hover:bg-gray-400"
                     >
