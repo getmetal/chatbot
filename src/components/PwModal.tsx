@@ -8,11 +8,12 @@ interface PwModalProps {
   pw: string;
   onClose: (open: boolean) => void;
   onPw: (pw: string) => void;
+  onSubmit: () => void;
 }
 
-const PwModal = ({ open, pw, onClose, onPw }: PwModalProps) => {
+const PwModal = ({ open, pw, onClose, onPw, onSubmit }: PwModalProps) => {
   return (
-    <Modal open={open} onClose={onClose} header={<div>
+    <Modal action={onSubmit} open={open} onClose={onClose} header={<div>
       <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-300">
         <LockClosedIcon className="h-6 w-6 text-green-900" aria-hidden="true" />
       </div>

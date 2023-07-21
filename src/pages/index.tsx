@@ -51,7 +51,7 @@ const Chat = () => {
   });
 
   useEffect(() => {
-    fetch("/api/protected").then(res => {
+    fetch("/api/password", { method: "POST" }).then(res => {
       if (res.status === 200) {
         setShowPwModal(true)
       }
@@ -99,7 +99,20 @@ const Chat = () => {
       {error ? <Error message={error} onDismiss={() => setError('')} /> : null}
       <PromptModal open={openPrompts} onClose={() => setOpenPrompts(false)} onPrompt={(txt: string) => setSystem(txt)} />
       <SourcesModal index={index} open={!!sources?.length} sources={sources} onClose={() => setSources([])} />
-      <PwModal open={showPwModal} onClose={() => setShowPwModal(false)} pw={pw} onPw={setPw} />
+      <PwModal open={showPwModal} onClose={() => setShowPwModal(false)} pw={pw} onPw={setPw} onSubmit={async () => {
+        setShowPwModal(false)
+
+        const res = await fetch("/api/password", {
+          method: "POST",
+          body: JSON.stringify({ pw }),
+        })
+
+        if (res.status === 401) {
+          setError("Invalid password")
+          return;
+        }
+
+      }} />
       <ConfigModal
         fields={[
           {
