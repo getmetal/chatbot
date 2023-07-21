@@ -11,7 +11,12 @@ export default async function handler(
   res: NextApiResponse<Data>
 ) {
 
-  const { prompt, index = process.env.METAL_INDEX_ID as string, chunkCount = 10 } = JSON.parse(req.body);
+  const { prompt, index = process.env.METAL_INDEX_ID as string, chunkCount = 10, pw } = JSON.parse(req.body);
+
+  const demoPw = process.env.DEMO_PW;
+  if (demoPw && pw !== demoPw) {
+    return res.status(401);
+  }
 
   const metalRes = await fetch(`https://api.getmetal.io/v1/search?limit=${chunkCount}`, {
     method: 'POST',

@@ -31,7 +31,15 @@ function getTokenCount(messages: any[]) {
 
 
 export default async function handler(req: any) {
-  const { messages, chunkCount, maxTokens, temperature, system } = await req.json()
+  const { messages, chunkCount, maxTokens, temperature, system, pw } = await req.json()
+
+  const demoPw = process.env.DEMO_PW;
+  if (demoPw && pw !== demoPw) {
+    return new Response('Unauthorized', {
+      status: 401,
+    });
+  }
+
 
   try {
     const last = messages.pop();

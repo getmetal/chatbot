@@ -32,3 +32,6 @@ npm run dev
 
 ### 5. 🧠 Ask a question!
 Enjoy your new chatbot experience at [http://localhost:3000](http://localhost:3000).
+
+## Password Protection
+This chatbot supports password protection for your data. To enable this feature, simply add a `DEMO_PW` to your environment variables. The chatbot will automatically prompt the user for a password before allowing them to access the various endpoints.

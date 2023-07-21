@@ -8,13 +8,17 @@ import { CogIcon, InformationCircleIcon, NewspaperIcon, LightBulbIcon, UserIcon 
 import ConfigModal from '@/components/ConfigModal'
 import Error from '@/components/Error';
 import PromptModal from "@/components/PromptModal";
+import PwModal from "@/components/PwModal";
 import SourcesModal from "@/components/SourcesModal";
 import Textarea from "@/components/Textarea";
 import { DEFAULT_PROMPT } from '@/helpers/prompts';
 
 
 const Chat = () => {
-  const messagesEndRef = useRef(null)
+  const messagesEndRef = useRef(null);
+
+  const [showPwModal, setShowPwModal] = useState(false);
+  const [pw, setPw] = useState('');
 
   const [openConfig, setOpenConfig] = useState(false);
   const [openPrompts, setOpenPrompts] = useState(false);
@@ -36,6 +40,7 @@ const Chat = () => {
       chunkCount,
       temperature,
       maxTokens,
+      pw,
     },
     onResponse: res => {
       const headers = res?.headers;
@@ -44,6 +49,14 @@ const Chat = () => {
       setTokenCount(tokenCountInt);
     },
   });
+
+  useEffect(() => {
+    fetch("/api/protected").then(res => {
+      if (res.status === 200) {
+        setShowPwModal(true)
+      }
+    })
+  }, [])
 
   useEffect(() => {
     if (chatError) {
@@ -63,7 +76,7 @@ const Chat = () => {
     setSourcesLoading(true)
     const sourcesRes = await fetch("/api/sources", {
       method: "POST",
-      body: JSON.stringify({ prompt: _q, chunkCount }),
+      body: JSON.stringify({ prompt: _q, chunkCount, pw }),
     })
 
 
@@ -86,6 +99,7 @@ const Chat = () => {
       {error ? <Error message={error} onDismiss={() => setError('')} /> : null}
       <PromptModal open={openPrompts} onClose={() => setOpenPrompts(false)} onPrompt={(txt: string) => setSystem(txt)} />
       <SourcesModal index={index} open={!!sources?.length} sources={sources} onClose={() => setSources([])} />
+      <PwModal open={showPwModal} onClose={() => setShowPwModal(false)} pw={pw} onPw={setPw} />
       <ConfigModal
         fields={[
           {
