@@ -1,6 +1,6 @@
 import { OpenAIStream, StreamingTextResponse } from 'ai';
 import { Configuration, OpenAIApi } from 'openai-edge';
-import { retrieveContext } from '@/helpers/metal';
+import { retrieveContext } from '@/helpers/motorhead';
 import { DEFAULT_PROMPT } from '@/helpers/prompts';
 import { encode } from 'gpt-tokenizer';
 
@@ -31,29 +31,29 @@ function getTokenCount(messages: any[]) {
 
 
 export default async function handler(req: any) {
-  const { messages, chunkCount, maxTokens, temperature, system, pw } = await req.json()
-
-  const demoPw = process.env.DEMO_PW;
-  if (demoPw && pw !== demoPw) {
-    return new Response('Unauthorized', {
-      status: 401,
-    });
-  }
-
+  const { messages, chunkCount, maxTokens, temperature, system, pw, session } = await req.json()
 
   try {
     const last = messages.pop();
-    const ctx = await retrieveContext(last.content, {
-      limit: chunkCount
-    });
+
+    await fetch(`http://localhost:8080/sessions/${session}/memory`, {
+      method: 'POST',
+      body: JSON.stringify({ messages: [last] }),
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    } as any)
+
+    const ctx = await retrieveContext(last.content, session);
 
     const responseQ = { ...last };
-
     responseQ.content = `
       Context: '''${ctx}'''
       Question: ${last.content}
       Answer:
     `;
+
+    console.log('responseQ', responseQ.content)
 
     const messagesWSystem = [
       {

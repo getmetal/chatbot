@@ -3,6 +3,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useChat } from 'ai/react'
 import ReactMarkdown from 'react-markdown'
 import Image from 'next/image'
+// import { useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/router'
+
 import { CogIcon, InformationCircleIcon, NewspaperIcon, LightBulbIcon, UserIcon } from '@heroicons/react/24/outline'
 
 import ConfigModal from '@/components/ConfigModal'
@@ -16,6 +19,10 @@ import { DEFAULT_PROMPT } from '@/helpers/prompts';
 
 const Chat = () => {
   const messagesEndRef = useRef(null);
+  const router = useRouter();
+  const { session } = router.query;
+  // const searchParams = useSearchParams();
+  // let session = searchParams.get('session');
 
   const [showPwModal, setShowPwModal] = useState(false);
   const [pw, setPw] = useState('');
@@ -41,6 +48,7 @@ const Chat = () => {
       temperature,
       maxTokens,
       pw,
+      session,
     },
     onResponse: res => {
       const headers = res?.headers;
@@ -48,7 +56,25 @@ const Chat = () => {
       const tokenCountInt = Number(hdrTokenCount);
       setTokenCount(tokenCountInt);
     },
+    onFinish: async ({ content, role }) => {
+      const messages = [{ content, role }];
+      await fetch(`/api/messages?session=${session}`, {
+        method: 'POST',
+        body: JSON.stringify({ messages }),
+      });
+    }
   });
+
+  useEffect(() => {
+    if (!session) return;
+    fetch(`/api/messages?session=${session}`, { method: 'GET' }).then(async res => {
+      if (res.status === 200) {
+        const json = await res.json();
+        const messages = json.data?.messages ?? [];
+        setMessages(messages);
+      }
+    })
+  }, [session])
 
   useEffect(() => {
     fetch("/api/password", { method: "POST" }).then(res => {
