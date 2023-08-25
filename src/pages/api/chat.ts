@@ -1,21 +1,23 @@
-import { OpenAIStream, StreamingTextResponse } from 'ai';
-import { Configuration, OpenAIApi } from 'openai-edge';
-import { retrieveContext } from '@/helpers/metal';
-import { DEFAULT_PROMPT } from '@/helpers/prompts';
-import { encode } from 'gpt-tokenizer';
+import { OpenAIStream, StreamingTextResponse } from "ai";
+import { Configuration, OpenAIApi } from "openai-edge";
+import { retrieveContext } from "@/helpers/metal";
+import { DEFAULT_PROMPT } from "@/helpers/prompts";
+import { encode } from "gpt-tokenizer";
 
 export const config = {
-  runtime: 'edge'
-}
+  runtime: "edge",
+};
+
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const OPENAI_MODEL = process.env.OPENAI_MODEL || "gpt-4";
 
 const openAiConfig = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY
-})
+  apiKey: OPENAI_API_KEY,
+});
 
-const openai = new OpenAIApi(openAiConfig)
+const openai = new OpenAIApi(openAiConfig);
 
 const DEFAULT_TEMPERATURE = 0;
-
 
 function getTokenCount(messages: any[]) {
   return new Promise((resolve, _reject) => {
@@ -26,25 +28,24 @@ function getTokenCount(messages: any[]) {
     }, 0);
 
     resolve(tokens);
-  })
+  });
 }
 
-
 export default async function handler(req: any) {
-  const { messages, chunkCount, maxTokens, temperature, system, pw } = await req.json()
+  const { messages, chunkCount, maxTokens, temperature, system, pw } =
+    await req.json();
 
   const demoPw = process.env.DEMO_PW;
   if (demoPw && pw !== demoPw) {
-    return new Response('Unauthorized', {
+    return new Response("Unauthorized", {
       status: 401,
     });
   }
 
-
   try {
     const last = messages.pop();
     const ctx = await retrieveContext(last.content, {
-      limit: chunkCount
+      limit: chunkCount,
     });
 
     const responseQ = { ...last };
@@ -65,7 +66,7 @@ export default async function handler(req: any) {
     ];
 
     const openAiBody = {
-      model: 'gpt-4',
+      model: OPENAI_MODEL,
       stream: true,
       messages: messagesWSystem,
       temperature: temperature || DEFAULT_TEMPERATURE,
@@ -82,21 +83,22 @@ export default async function handler(req: any) {
     ]);
 
     if (response?.status === 400) {
-      throw new Error('Context window exceeded. Please clear history and try again.')
+      throw new Error(
+        "Context window exceeded. Please clear history and try again."
+      );
     }
-    const stream = OpenAIStream(response)
+    const stream = OpenAIStream(response);
     return new StreamingTextResponse(stream, {
       headers: {
-        'x-metal-tokens': tokenCount,
+        "x-metal-tokens": tokenCount,
       } as any,
-    })
+    });
   } catch (e: any) {
     return new Response(e.message, {
       status: 400,
       headers: {
         "content-type": "application/json",
-      }
+      },
     });
   }
-
 }
